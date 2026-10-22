@@ -122,6 +122,10 @@ android {
         //jniLibs.srcDir 'libs'
         //jni.srcDirs = []
         res.srcDirs = ['src/main/res', 'src/main/res-solar', 'src/main/res-tabs']
+        // The proprietary submodule is private; fall back to open stubs when it is not checked out.
+        if (!file('src/main/java/com/radolyn/ayugram/proprietary/AyuHistoryHook.java').exists()) {
+            java.srcDirs += 'src/proprietaryStub/java'
+        }
     }
 
     lint {
