@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="AppName">HoursGram</string>
+    <string name="HoursGramStudioTitle">Студия HoursGram</string>
+    <string name="HoursGramStudioSubtitle">Локальное оформление профиля и коллекция</string>
+    <string name="HoursGramStudioLocalOnly">Звёзды и подарки сохраняются только на этом устройстве и не меняют ваш аккаунт Telegram.</string>
+    <string name="HoursGramStudioPreview">Предпросмотр профиля</string>
+    <string name="HoursGramStudioLocalStars">Локальные звёзды</string>
+    <string name="HoursGramStudioSetBalance">Задать баланс</string>
+    <string name="HoursGramStudioGrantStars">Добавить %1$d звёзд</string>
+    <string name="HoursGramStudioTheme">Оформление профиля</string>
+    <string name="HoursGramStudioInk">Чернила</string>
+    <string name="HoursGramStudioGraphite">Графит</string>
+    <string name="HoursGramStudioSilver">Серебро</string>
+    <string name="HoursGramStudioMarket">Магазин подарков</string>
+    <string name="HoursGramStudioMarketHint">Демо-каталог · покупки остаются локальными</string>
+    <string name="HoursGramStudioBuyGift">Добавить в профиль · %1$d ★</string>
+    <string name="HoursGramStudioOwned">Добавлено в профиль</string>
+    <string name="HoursGramStudioNeedStars">Добавьте локальные звёзды</string>
+    <string name="HoursGramStudioEmptyCollection">Подарков пока нет</string>
+    <string name="HoursGramStudioBalanceUpdated">Локальный баланс обновлён</string>
+    <string name="HoursGramStudioGiftCoffee">Чашка кофе</string>
+    <string name="HoursGramStudioGiftLollipop">Леденец</string>
+    <string name="HoursGramStudioGiftCookie">Печенье с сердцем</string>
+    <string name="HoursGramStudioGiftDuck">Счастливая уточка</string>
+    <string name="HoursGramStudioGiftBear">Плюшевый мишка</string>
+    <string name="HoursGramStudioGiftIceCream">Шоколадный батончик</string>
+    <string name="HoursGramStudioGiftLantern">Фонарь</string>
+    <string name="HoursGramStudioGiftTrophy">Золотой кубок</string>
+</resources>
