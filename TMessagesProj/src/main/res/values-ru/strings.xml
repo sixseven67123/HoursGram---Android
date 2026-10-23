@@ -27,4 +27,14 @@
     <string name="HoursGramStudioGiftIceCream">Шоколадный батончик</string>
     <string name="HoursGramStudioGiftLantern">Фонарь</string>
     <string name="HoursGramStudioGiftTrophy">Золотой кубок</string>
+    <string name="HoursGramStudioLocalProfile">Предпросмотр профиля HoursGram</string>
+    <string name="HoursGramStudioLocalOnlyShort">только на устройстве</string>
+    <string name="HoursGramStudioActionStars">Звёзды</string>
+    <string name="HoursGramStudioActionGifts">Подарки</string>
+    <string name="HoursGramStudioCollection">Моя коллекция</string>
+    <string name="HoursGramStudioId">ID</string>
+    <string name="HoursGramStudioBio">О себе</string>
+    <string name="HoursGramStudioUsername">Имя пользователя</string>
+    <string name="HoursGramStudioNoBio">Описание не добавлено</string>
+    <string name="HoursGramStudioNoUsername">Имя пользователя не задано</string>
 </resources>

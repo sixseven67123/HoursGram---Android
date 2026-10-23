@@ -7,12 +7,12 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,9 +22,12 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.Components.AvatarDrawable;
+import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.LayoutHelper;
 
 import java.util.Collections;
@@ -66,6 +69,8 @@ public class HoursGramStudioActivity extends BaseFragment {
     private SharedPreferences preferences;
     private LinearLayout contentLayout;
     private ScrollView scrollView;
+    private View starsSectionView;
+    private View giftMarketSectionView;
     private Typeface bodyTypeface;
     private Typeface headingTypeface;
     private long userId;
@@ -154,36 +159,110 @@ public class HoursGramStudioActivity extends BaseFragment {
 
     private void addProfilePreview() {
         addSectionHeading(contentLayout, R.string.HoursGramStudioPreview, R.string.HoursGramStudioSubtitle);
-        LinearLayout card = createCard(contentLayout);
-        card.setBackground(makeRoundedDrawable(getThemeColor(), AndroidUtilities.dp(20)));
-
         TLRPC.User self = getUserConfig().getCurrentUser();
-        String displayName = self == null ? "HoursGram" : ((self.first_name == null ? "" : self.first_name) + " " + (self.last_name == null ? "" : self.last_name)).trim();
+        String displayName = self == null ? "HoursGram" : TextUtils.join(" ", new String[] {
+                self.first_name == null ? "" : self.first_name,
+                self.last_name == null ? "" : self.last_name
+        }).trim();
         if (displayName.isEmpty()) displayName = "HoursGram";
+        String username = self == null ? "" : UserObject.getPublicUsername(self);
+        String about = "";
+        if (self != null) {
+            TLRPC.UserFull userFull = getMessagesController().getUserFull(self.id);
+            if (userFull != null) {
+                about = userFull.about;
+            }
+        }
 
-        LinearLayout header = new LinearLayout(getParentActivity());
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        card.addView(header, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        ImageView logo = new ImageView(getParentActivity());
-        logo.setImageResource(R.mipmap.hoursgram_logo);
-        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        header.addView(logo, new LinearLayout.LayoutParams(AndroidUtilities.dp(48), AndroidUtilities.dp(48)));
-        LinearLayout titleColumn = new LinearLayout(getParentActivity());
-        titleColumn.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams titleColumnParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        titleColumnParams.leftMargin = AndroidUtilities.dp(12);
-        header.addView(titleColumn, titleColumnParams);
-        TextView name = createText(displayName, 20, MAIN_TEXT_COLOR, true);
-        titleColumn.addView(name, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        TextView localTag = createText(LocaleController.getString("HoursGramStudioLocalStars", R.string.HoursGramStudioLocalStars) + " · " + localStars, 13, ACCENT_COLOR, false);
-        localTag.setPadding(0, AndroidUtilities.dp(4), 0, 0);
-        titleColumn.addView(localTag, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        LinearLayout profileCard = createCard(contentLayout);
+        profileCard.setBackground(makeRoundedDrawable(getThemeColor(), AndroidUtilities.dp(24)));
+        profileCard.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(20), AndroidUtilities.dp(16), AndroidUtilities.dp(16));
+
+        LinearLayout identity = new LinearLayout(getParentActivity());
+        identity.setOrientation(LinearLayout.VERTICAL);
+        identity.setGravity(Gravity.CENTER_HORIZONTAL);
+        profileCard.addView(identity, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        BackupImageView avatar = new BackupImageView(getParentActivity());
+        avatar.setRoundRadius(AndroidUtilities.dp(48));
+        avatar.setForUserOrChat(self, new AvatarDrawable(self));
+        identity.addView(avatar, new LinearLayout.LayoutParams(AndroidUtilities.dp(96), AndroidUtilities.dp(96)));
+
+        TextView name = createText(displayName, 21, MAIN_TEXT_COLOR, true);
+        name.setGravity(Gravity.CENTER);
+        name.setSingleLine(true);
+        name.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        nameParams.topMargin = AndroidUtilities.dp(12);
+        identity.addView(name, nameParams);
+
+        String usernameText = TextUtils.isEmpty(username) ? "" : "@" + username;
+        TextView accountLine = createText(TextUtils.isEmpty(usernameText)
+                ? LocaleController.getString("HoursGramStudioLocalProfile", R.string.HoursGramStudioLocalProfile)
+                : usernameText, 13, ACCENT_COLOR, false);
+        accountLine.setGravity(Gravity.CENTER);
+        accountLine.setPadding(0, AndroidUtilities.dp(4), 0, 0);
+        identity.addView(accountLine, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView balanceChip = createText("★  " + localStars + "  ·  " + LocaleController.getString("HoursGramStudioLocalOnlyShort", R.string.HoursGramStudioLocalOnlyShort), 12, ACCENT_COLOR, true);
+        balanceChip.setGravity(Gravity.CENTER);
+        balanceChip.setPadding(AndroidUtilities.dp(12), AndroidUtilities.dp(7), AndroidUtilities.dp(12), AndroidUtilities.dp(7));
+        balanceChip.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(20)));
+        LinearLayout.LayoutParams balanceParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        balanceParams.topMargin = AndroidUtilities.dp(12);
+        identity.addView(balanceChip, balanceParams);
+
+        LinearLayout actionRow = new LinearLayout(getParentActivity());
+        actionRow.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams actionRowParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(42));
+        actionRowParams.topMargin = AndroidUtilities.dp(18);
+        profileCard.addView(actionRow, actionRowParams);
+
+        TextView editAction = createButton(LocaleController.getString("EditName", R.string.EditName), false);
+        editAction.setOnClickListener(v -> presentFragment(new ChangeNameActivity(null)));
+        actionRow.addView(editAction, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+        TextView starsAction = createButton(LocaleController.getString("HoursGramStudioActionStars", R.string.HoursGramStudioActionStars), false);
+        starsAction.setOnClickListener(v -> scrollToSection(starsSectionView));
+        LinearLayout.LayoutParams starsActionParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        starsActionParams.leftMargin = AndroidUtilities.dp(8);
+        actionRow.addView(starsAction, starsActionParams);
+        TextView giftsAction = createButton(LocaleController.getString("HoursGramStudioActionGifts", R.string.HoursGramStudioActionGifts), false);
+        giftsAction.setOnClickListener(v -> scrollToSection(giftMarketSectionView));
+        LinearLayout.LayoutParams giftsActionParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        giftsActionParams.leftMargin = AndroidUtilities.dp(8);
+        actionRow.addView(giftsAction, giftsActionParams);
+
+        LinearLayout infoCard = createCard(contentLayout);
+        infoCard.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(20)));
+        LinearLayout.LayoutParams infoCardParams = (LinearLayout.LayoutParams) infoCard.getLayoutParams();
+        infoCardParams.topMargin = AndroidUtilities.dp(10);
+        infoCard.setLayoutParams(infoCardParams);
+        addProfileInfoRow(infoCard, String.valueOf(self == null ? 0 : self.id), LocaleController.getString("HoursGramStudioId", R.string.HoursGramStudioId));
+        addProfileInfoRow(infoCard, TextUtils.isEmpty(about)
+                ? LocaleController.getString("HoursGramStudioNoBio", R.string.HoursGramStudioNoBio)
+                : about, LocaleController.getString("HoursGramStudioBio", R.string.HoursGramStudioBio));
+        addProfileInfoRow(infoCard, TextUtils.isEmpty(usernameText)
+                ? LocaleController.getString("HoursGramStudioNoUsername", R.string.HoursGramStudioNoUsername)
+                : usernameText, LocaleController.getString("HoursGramStudioUsername", R.string.HoursGramStudioUsername));
+
+        LinearLayout collectionCard = createCard(contentLayout);
+        collectionCard.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(20)));
+        LinearLayout.LayoutParams collectionParams = (LinearLayout.LayoutParams) collectionCard.getLayoutParams();
+        collectionParams.topMargin = AndroidUtilities.dp(10);
+        collectionCard.setLayoutParams(collectionParams);
+        LinearLayout collectionHeader = new LinearLayout(getParentActivity());
+        collectionHeader.setGravity(Gravity.CENTER_VERTICAL);
+        collectionCard.addView(collectionHeader, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        TextView collectionName = createText(LocaleController.getString("HoursGramStudioCollection", R.string.HoursGramStudioCollection), 15, MAIN_TEXT_COLOR, true);
+        collectionHeader.addView(collectionName, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView collectionCount = createText(String.valueOf(ownedGiftIds.size()), 13, ACCENT_COLOR, true);
+        collectionHeader.addView(collectionCount, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         LinearLayout giftRow = new LinearLayout(getParentActivity());
         giftRow.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams giftRowParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         giftRowParams.topMargin = AndroidUtilities.dp(12);
-        card.addView(giftRow, giftRowParams);
+        collectionCard.addView(giftRow, giftRowParams);
         boolean hasGifts = false;
         for (int i = 0; i < GIFT_IDS.length; i++) {
             if (!ownedGiftIds.contains(GIFT_IDS[i])) continue;
@@ -199,7 +278,33 @@ public class HoursGramStudioActivity extends BaseFragment {
             TextView empty = createText(LocaleController.getString("HoursGramStudioEmptyCollection", R.string.HoursGramStudioEmptyCollection), 13, SUBTITLE_COLOR, false);
             giftRow.addView(empty, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
+        TextView openMarket = createButton(LocaleController.getString("HoursGramStudioActionGifts", R.string.HoursGramStudioActionGifts), false);
+        openMarket.setOnClickListener(v -> scrollToSection(giftMarketSectionView));
+        LinearLayout.LayoutParams openMarketParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(40));
+        openMarketParams.topMargin = AndroidUtilities.dp(12);
+        collectionCard.addView(openMarket, openMarketParams);
         addBottomSpace(contentLayout, 16);
+    }
+
+    private void addProfileInfoRow(LinearLayout parent, String value, String label) {
+        LinearLayout row = new LinearLayout(getParentActivity());
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setPadding(0, AndroidUtilities.dp(2), 0, AndroidUtilities.dp(10));
+        parent.addView(row, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        TextView valueView = createText(value, 14, MAIN_TEXT_COLOR, false);
+        valueView.setMaxLines(3);
+        valueView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        row.addView(valueView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        TextView labelView = createText(label, 12, SUBTITLE_COLOR, false);
+        LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        labelParams.topMargin = AndroidUtilities.dp(2);
+        row.addView(labelView, labelParams);
+    }
+
+    private void scrollToSection(View target) {
+        if (target != null && scrollView != null) {
+            scrollView.smoothScrollTo(0, target.getTop());
+        }
     }
 
     private int getThemeColor() {
@@ -243,7 +348,7 @@ public class HoursGramStudioActivity extends BaseFragment {
     }
 
     private void addStarsWallet() {
-        addSectionHeading(contentLayout, R.string.HoursGramStudioLocalStars, 0);
+        starsSectionView = addSectionHeading(contentLayout, R.string.HoursGramStudioLocalStars, 0);
         LinearLayout card = createCard(contentLayout);
         card.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(16)));
         TextView balance = createText(String.valueOf(localStars) + " ★", 28, ACCENT_COLOR, true);
@@ -303,7 +408,7 @@ public class HoursGramStudioActivity extends BaseFragment {
     }
 
     private void addGiftMarket() {
-        addSectionHeading(contentLayout, R.string.HoursGramStudioMarket, R.string.HoursGramStudioMarketHint);
+        giftMarketSectionView = addSectionHeading(contentLayout, R.string.HoursGramStudioMarket, R.string.HoursGramStudioMarketHint);
         for (int start = 0; start < GIFT_IDS.length; start += 2) {
             LinearLayout row = new LinearLayout(getParentActivity());
             row.setOrientation(LinearLayout.HORIZONTAL);
@@ -364,7 +469,7 @@ public class HoursGramStudioActivity extends BaseFragment {
         return card;
     }
 
-    private void addSectionHeading(LinearLayout parent, int titleRes, int subtitleRes) {
+    private TextView addSectionHeading(LinearLayout parent, int titleRes, int subtitleRes) {
         TextView title = createText(LocaleController.getString(titleRes), 17, MAIN_TEXT_COLOR, true);
         parent.addView(title, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         if (subtitleRes != 0) {
@@ -376,6 +481,7 @@ public class HoursGramStudioActivity extends BaseFragment {
         } else {
             addBottomSpace(parent, 10);
         }
+        return title;
     }
 
     private LinearLayout createCard(LinearLayout parent) {

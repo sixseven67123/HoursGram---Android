@@ -27,6 +27,16 @@
     <string name="HoursGramStudioGiftIceCream">Chocolate Bar</string>
     <string name="HoursGramStudioGiftLantern">Lantern</string>
     <string name="HoursGramStudioGiftTrophy">Golden Trophy</string>
+    <string name="HoursGramStudioLocalProfile">HoursGram profile preview</string>
+    <string name="HoursGramStudioLocalOnlyShort">on this device</string>
+    <string name="HoursGramStudioActionStars">Stars</string>
+    <string name="HoursGramStudioActionGifts">Gifts</string>
+    <string name="HoursGramStudioCollection">My collection</string>
+    <string name="HoursGramStudioId">ID</string>
+    <string name="HoursGramStudioBio">About</string>
+    <string name="HoursGramStudioUsername">Username</string>
+    <string name="HoursGramStudioNoBio">No bio</string>
+    <string name="HoursGramStudioNoUsername">Username not set</string>
     <string name="AppNameBeta">HoursGram Beta</string>
     <string name="LanguageName">English</string>
     <string name="English">English</string>
