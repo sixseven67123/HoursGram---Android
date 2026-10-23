@@ -13,7 +13,13 @@
     <string name="HoursGramStudioGraphite">Графит</string>
     <string name="HoursGramStudioSilver">Серебро</string>
     <string name="HoursGramStudioMarket">Магазин подарков</string>
-    <string name="HoursGramStudioMarketHint">Демо-каталог · покупки остаются локальными</string>
+    <string name="HoursGramStudioMarketHint">Каталог подарков Telegram · покупки остаются локальными</string>
+    <string name="HoursGramStudioMarketLoading">Загружаем подарки Telegram…</string>
+    <string name="HoursGramStudioMarketEmpty">Сейчас доступных подарков нет</string>
+    <string name="HoursGramStudioMarketError">Не удалось загрузить подарки. Проверьте подключение и повторите попытку.</string>
+    <string name="HoursGramStudioRetry">Повторить</string>
+    <string name="HoursGramStudioShowMore">Показать ещё подарки</string>
+    <string name="HoursGramStudioGift">Подарок</string>
     <string name="HoursGramStudioBuyGift">Добавить в профиль · %1$d ★</string>
     <string name="HoursGramStudioOwned">Добавлено в профиль</string>
     <string name="HoursGramStudioNeedStars">Добавьте локальные звёзды</string>

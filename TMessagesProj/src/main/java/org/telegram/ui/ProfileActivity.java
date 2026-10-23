@@ -27,7 +27,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ConfigurationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.DataSetObserver;
@@ -8998,12 +8997,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     cell.getTextView().setGravity(Gravity.CENTER_HORIZONTAL);
                     cell.getTextView().setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText3));
                     cell.getTextView().setMovementMethod(null);
-                    try {
-                        PackageInfo info = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-                        cell.setText(LocaleUtils.getAppName() + " " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.AYU_VERSION + ")" + (AppUtils.isAppModified() ? "\nbased on @exteraGram " + info.versionCode : ""));
-                    } catch (PackageManager.NameNotFoundException e) {
-                        FileLog.e(e);
-                    }
+                    cell.setText(LocaleUtils.getAppName() + " " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.AYU_VERSION + ")" + (AppUtils.isAppModified() ? "\nHoursGram" : ""));
                     cell.getTextView().setPadding(0, AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14));
                     view = cell;
                     view.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, getThemedColor(Theme.key_windowBackgroundGrayShadow)));
@@ -9338,7 +9332,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         if (!ExteraConfig.useSolarIcons)
                             textCell.setImageLeft(23);
                     } else if (position == exteraRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("Preferences", R.string.Preferences), R.drawable.etg_settings, true);
+                        textCell.setTextAndIcon(LocaleController.getString("Preferences", R.string.Preferences), R.mipmap.hoursgram_logo, true);
                     } else if (position == ayuRow) {
                         textCell.setTextAndIcon(LocaleController.getString("AyuPreferences", R.string.AyuPreferences), R.drawable.msg2_reactions2, true);
                     } else if (position == hoursGramStudioRow) {

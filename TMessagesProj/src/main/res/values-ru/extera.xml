@@ -12,7 +12,7 @@
 -->
 
 <resources>
-    <string name="Preferences">Настройки exteraGram</string>
+    <string name="Preferences">Настройки HoursGram</string>
 
     <!-- Main Menu -->
     <string name="Links">Ссылки</string>

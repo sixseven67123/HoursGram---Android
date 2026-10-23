@@ -23,14 +23,19 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserObject;
+import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.HoursGramStarGiftCatalog;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.RLottieImageView;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,28 +47,8 @@ public class HoursGramStudioActivity extends BaseFragment {
     private static final int SUBTITLE_COLOR = Color.rgb(177, 178, 183);
     private static final int MAIN_TEXT_COLOR = Color.WHITE;
     private static final int MAX_STARS = 999999999;
+    private static final int MARKET_PAGE_SIZE = 12;
     private static final String PREFERENCES_NAME = "hoursgram_profile_cosmetics";
-    private static final String[] THEMES = {"ink", "graphite", "silver"};
-    private static final int[] THEME_LABELS = {
-            R.string.HoursGramStudioInk,
-            R.string.HoursGramStudioGraphite,
-            R.string.HoursGramStudioSilver
-    };
-    private static final int[] GIFT_NAMES = {
-            R.string.HoursGramStudioGiftCoffee,
-            R.string.HoursGramStudioGiftLollipop,
-            R.string.HoursGramStudioGiftCookie,
-            R.string.HoursGramStudioGiftDuck,
-            R.string.HoursGramStudioGiftBear,
-            R.string.HoursGramStudioGiftIceCream,
-            R.string.HoursGramStudioGiftLantern,
-            R.string.HoursGramStudioGiftTrophy
-    };
-    private static final String[] GIFT_IDS = {
-            "coffee", "lollipop", "cookie", "duck", "bear", "ice_cream", "lantern", "trophy"
-    };
-    private static final String[] GIFT_EMOJIS = {"☕", "🍭", "🍪", "🦆", "🧸", "🍫", "🏮", "🏆"};
-    private static final int[] GIFT_PRICES = {55, 70, 85, 90, 110, 75, 120, 150};
     private static final int[] GRANT_AMOUNTS = {100, 500, 1000};
 
     private SharedPreferences preferences;
@@ -75,8 +60,12 @@ public class HoursGramStudioActivity extends BaseFragment {
     private Typeface headingTypeface;
     private long userId;
     private int localStars;
-    private String selectedTheme = THEMES[0];
     private Set<String> ownedGiftIds = new HashSet<>();
+    private final ArrayList<HoursGramStarGiftCatalog.Gift> starGifts = new ArrayList<>();
+    private boolean isGiftCatalogLoading;
+    private boolean hasGiftCatalogLoaded;
+    private boolean hasGiftCatalogError;
+    private int marketDisplayedCount = MARKET_PAGE_SIZE;
 
     public HoursGramStudioActivity() {
         super();
@@ -89,13 +78,12 @@ public class HoursGramStudioActivity extends BaseFragment {
         userId = self != null ? self.id : getUserConfig().getClientUserId();
         preferences = ApplicationLoader.applicationContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         loadCosmetics();
+        loadStarGiftCatalog();
         return true;
     }
 
     private void loadCosmetics() {
         localStars = Math.max(0, preferences.getInt("stars_" + userId, 0));
-        String storedTheme = preferences.getString("theme_" + userId, THEMES[0]);
-        selectedTheme = isValidTheme(storedTheme) ? storedTheme : THEMES[0];
         Set<String> storedGiftIds = preferences.getStringSet("gifts_" + userId, Collections.emptySet());
         ownedGiftIds = storedGiftIds == null ? new HashSet<>() : new HashSet<>(storedGiftIds);
     }
@@ -103,16 +91,34 @@ public class HoursGramStudioActivity extends BaseFragment {
     private void saveCosmetics() {
         preferences.edit()
                 .putInt("stars_" + userId, localStars)
-                .putString("theme_" + userId, selectedTheme)
                 .putStringSet("gifts_" + userId, new HashSet<>(ownedGiftIds))
                 .apply();
     }
 
-    private boolean isValidTheme(String theme) {
-        for (String option : THEMES) {
-            if (option.equals(theme)) return true;
-        }
-        return false;
+    private void loadStarGiftCatalog() {
+        if (isGiftCatalogLoading || hasGiftCatalogLoaded) return;
+        isGiftCatalogLoading = true;
+        ConnectionsManager.getInstance(currentAccount).sendRequest(new HoursGramStarGiftCatalog.GetStarGifts(), (response, error) -> {
+            AndroidUtilities.runOnUIThread(() -> {
+                isGiftCatalogLoading = false;
+                hasGiftCatalogError = error != null || !(response instanceof HoursGramStarGiftCatalog.Response);
+                if (!hasGiftCatalogError) {
+                    HoursGramStarGiftCatalog.Response catalog = (HoursGramStarGiftCatalog.Response) response;
+                    starGifts.clear();
+                    starGifts.addAll(catalog.gifts);
+                    Collections.sort(starGifts, new Comparator<HoursGramStarGiftCatalog.Gift>() {
+                        @Override
+                        public int compare(HoursGramStarGiftCatalog.Gift first, HoursGramStarGiftCatalog.Gift second) {
+                            return Long.compare(first.stars, second.stars);
+                        }
+                    });
+                    hasGiftCatalogLoaded = true;
+                }
+                if (contentLayout != null && getParentActivity() != null) {
+                    renderContent();
+                }
+            });
+        });
     }
 
     @Override
@@ -151,7 +157,6 @@ public class HoursGramStudioActivity extends BaseFragment {
         contentLayout.removeAllViews();
         addProfilePreview();
         addLocalNotice();
-        addThemePicker();
         addStarsWallet();
         addGiftMarket();
         scrollView.post(() -> scrollView.scrollTo(0, scrollY));
@@ -175,7 +180,7 @@ public class HoursGramStudioActivity extends BaseFragment {
         }
 
         LinearLayout profileCard = createCard(contentLayout);
-        profileCard.setBackground(makeRoundedDrawable(getThemeColor(), AndroidUtilities.dp(24)));
+        profileCard.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(24)));
         profileCard.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(20), AndroidUtilities.dp(16), AndroidUtilities.dp(16));
 
         LinearLayout identity = new LinearLayout(getParentActivity());
@@ -264,15 +269,14 @@ public class HoursGramStudioActivity extends BaseFragment {
         giftRowParams.topMargin = AndroidUtilities.dp(12);
         collectionCard.addView(giftRow, giftRowParams);
         boolean hasGifts = false;
-        for (int i = 0; i < GIFT_IDS.length; i++) {
-            if (!ownedGiftIds.contains(GIFT_IDS[i])) continue;
+        for (HoursGramStarGiftCatalog.Gift gift : starGifts) {
+            if (!ownedGiftIds.contains(String.valueOf(gift.id))) continue;
             hasGifts = true;
-            TextView gift = createText(GIFT_EMOJIS[i], 26, MAIN_TEXT_COLOR, false);
-            gift.setGravity(Gravity.CENTER);
-            gift.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(14)));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(AndroidUtilities.dp(48), AndroidUtilities.dp(48));
+            RLottieImageView image = createGiftAnimation(gift.sticker, 44);
+            image.setBackground(makeRoundedDrawable(APP_BACKGROUND, AndroidUtilities.dp(14)));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(AndroidUtilities.dp(52), AndroidUtilities.dp(52));
             params.rightMargin = AndroidUtilities.dp(8);
-            giftRow.addView(gift, params);
+            giftRow.addView(image, params);
         }
         if (!hasGifts) {
             TextView empty = createText(LocaleController.getString("HoursGramStudioEmptyCollection", R.string.HoursGramStudioEmptyCollection), 13, SUBTITLE_COLOR, false);
@@ -307,43 +311,12 @@ public class HoursGramStudioActivity extends BaseFragment {
         }
     }
 
-    private int getThemeColor() {
-        switch (selectedTheme) {
-            case "graphite":
-                return Color.rgb(46, 48, 60);
-            case "silver":
-                return Color.rgb(78, 81, 98);
-            default:
-                return Color.rgb(35, 37, 47);
-        }
-    }
-
     private void addLocalNotice() {
         LinearLayout notice = createCard(contentLayout);
         notice.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(14)));
         TextView text = createText(LocaleController.getString("HoursGramStudioLocalOnly", R.string.HoursGramStudioLocalOnly), 13, SUBTITLE_COLOR, false);
         text.setLineSpacing(AndroidUtilities.dp(2), 1f);
         notice.addView(text, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        addBottomSpace(contentLayout, 20);
-    }
-
-    private void addThemePicker() {
-        addSectionHeading(contentLayout, R.string.HoursGramStudioTheme, 0);
-        LinearLayout row = new LinearLayout(getParentActivity());
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        contentLayout.addView(row, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        for (int i = 0; i < THEMES.length; i++) {
-            final String theme = THEMES[i];
-            TextView option = createButton(LocaleController.getString(THEME_LABELS[i]), selectedTheme.equals(theme));
-            option.setOnClickListener(v -> {
-                selectedTheme = theme;
-                saveCosmetics();
-                renderContent();
-            });
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(46), 1f);
-            params.rightMargin = i == THEMES.length - 1 ? 0 : AndroidUtilities.dp(8);
-            row.addView(option, params);
-        }
         addBottomSpace(contentLayout, 20);
     }
 
@@ -409,48 +382,99 @@ public class HoursGramStudioActivity extends BaseFragment {
 
     private void addGiftMarket() {
         giftMarketSectionView = addSectionHeading(contentLayout, R.string.HoursGramStudioMarket, R.string.HoursGramStudioMarketHint);
-        for (int start = 0; start < GIFT_IDS.length; start += 2) {
+        if (isGiftCatalogLoading) {
+            addCatalogMessage(R.string.HoursGramStudioMarketLoading, false);
+            return;
+        }
+        if (hasGiftCatalogError) {
+            addCatalogMessage(R.string.HoursGramStudioMarketError, true);
+            return;
+        }
+
+        ArrayList<HoursGramStarGiftCatalog.Gift> availableGifts = new ArrayList<>();
+        for (HoursGramStarGiftCatalog.Gift gift : starGifts) {
+            if (!gift.isSoldOut && (gift.availabilityResale > 0 || gift.isLimited)) {
+                availableGifts.add(gift);
+            }
+        }
+        if (availableGifts.isEmpty()) {
+            addCatalogMessage(R.string.HoursGramStudioMarketEmpty, false);
+            return;
+        }
+
+        int visibleCount = Math.min(marketDisplayedCount, availableGifts.size());
+        for (int start = 0; start < visibleCount; start += 2) {
             LinearLayout row = new LinearLayout(getParentActivity());
             row.setOrientation(LinearLayout.HORIZONTAL);
             contentLayout.addView(row, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            row.addView(createGiftCard(start), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(createGiftCard(availableGifts.get(start)), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             int next = start + 1;
-            if (next < GIFT_IDS.length) {
+            if (next < visibleCount) {
                 View space = new View(getParentActivity());
                 row.addView(space, new LinearLayout.LayoutParams(AndroidUtilities.dp(8), 1));
-                row.addView(createGiftCard(next), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+                row.addView(createGiftCard(availableGifts.get(next)), new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             }
             addBottomSpace(contentLayout, 8);
         }
+        if (visibleCount < availableGifts.size()) {
+            TextView more = createButton(LocaleController.getString("HoursGramStudioShowMore", R.string.HoursGramStudioShowMore), false);
+            more.setOnClickListener(v -> {
+                marketDisplayedCount = Math.min(availableGifts.size(), marketDisplayedCount + MARKET_PAGE_SIZE);
+                renderContent();
+            });
+            contentLayout.addView(more, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(44)));
+        }
     }
 
-    private View createGiftCard(int index) {
+    private void addCatalogMessage(int textRes, boolean canRetry) {
+        TextView message = createText(LocaleController.getString(textRes), 13, SUBTITLE_COLOR, false);
+        message.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(16), AndroidUtilities.dp(14), AndroidUtilities.dp(16));
+        message.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(16)));
+        contentLayout.addView(message, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        if (canRetry) {
+            TextView retry = createButton(LocaleController.getString("HoursGramStudioRetry", R.string.HoursGramStudioRetry), false);
+            retry.setOnClickListener(v -> {
+                hasGiftCatalogError = false;
+                loadStarGiftCatalog();
+                renderContent();
+            });
+            LinearLayout.LayoutParams retryParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(42));
+            retryParams.topMargin = AndroidUtilities.dp(8);
+            contentLayout.addView(retry, retryParams);
+        }
+    }
+
+    private View createGiftCard(HoursGramStarGiftCatalog.Gift gift) {
         LinearLayout card = new LinearLayout(getParentActivity());
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackground(makeRoundedDrawable(CARD_BACKGROUND, AndroidUtilities.dp(16)));
         card.setPadding(AndroidUtilities.dp(10), AndroidUtilities.dp(12), AndroidUtilities.dp(10), AndroidUtilities.dp(10));
 
-        TextView emoji = createText(GIFT_EMOJIS[index], 34, MAIN_TEXT_COLOR, false);
-        emoji.setGravity(Gravity.CENTER);
-        card.addView(emoji, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(52)));
+        RLottieImageView giftImage = createGiftAnimation(gift.sticker, 76);
+        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(84));
+        card.addView(giftImage, imageParams);
 
-        TextView title = createText(LocaleController.getString(GIFT_NAMES[index]), 13, MAIN_TEXT_COLOR, true);
+        String giftName = TextUtils.isEmpty(gift.title)
+                ? LocaleController.getString("HoursGramStudioGift", R.string.HoursGramStudioGift)
+                : gift.title;
+        TextView title = createText(giftName, 13, MAIN_TEXT_COLOR, true);
         title.setGravity(Gravity.CENTER);
         title.setSingleLine(true);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(30));
         titleParams.topMargin = AndroidUtilities.dp(4);
         card.addView(title, titleParams);
 
-        TextView price = createText(GIFT_PRICES[index] + " ★", 12, SUBTITLE_COLOR, false);
+        TextView price = createText(gift.stars + " ★", 12, SUBTITLE_COLOR, false);
         price.setGravity(Gravity.CENTER);
         card.addView(price, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, AndroidUtilities.dp(26)));
 
-        boolean isOwned = ownedGiftIds.contains(GIFT_IDS[index]);
-        boolean canAfford = localStars >= GIFT_PRICES[index];
+        String giftId = String.valueOf(gift.id);
+        boolean isOwned = ownedGiftIds.contains(giftId);
+        boolean canAfford = localStars >= gift.stars;
         TextView action = createButton(isOwned
                 ? LocaleController.getString("HoursGramStudioOwned", R.string.HoursGramStudioOwned)
                 : canAfford
-                    ? LocaleController.formatString("HoursGramStudioBuyGift", R.string.HoursGramStudioBuyGift, GIFT_PRICES[index])
+                    ? LocaleController.formatString("HoursGramStudioBuyGift", R.string.HoursGramStudioBuyGift, gift.stars)
                     : LocaleController.getString("HoursGramStudioNeedStars", R.string.HoursGramStudioNeedStars), isOwned || canAfford);
         action.setTextSize(10);
         action.setEnabled(!isOwned && canAfford);
@@ -460,13 +484,23 @@ public class HoursGramStudioActivity extends BaseFragment {
         card.addView(action, actionParams);
         if (!isOwned && canAfford) {
             action.setOnClickListener(v -> {
-                localStars -= GIFT_PRICES[index];
-                ownedGiftIds.add(GIFT_IDS[index]);
+                localStars -= (int) gift.stars;
+                ownedGiftIds.add(giftId);
                 saveCosmetics();
                 renderContent();
             });
         }
         return card;
+    }
+
+    private RLottieImageView createGiftAnimation(TLRPC.Document document, int sizeDp) {
+        RLottieImageView image = new RLottieImageView(getParentActivity());
+        image.setAutoRepeat(true);
+        image.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        if (document != null) {
+            image.setAnimation(document, sizeDp, sizeDp);
+        }
+        return image;
     }
 
     private TextView addSectionHeading(LinearLayout parent, int titleRes, int subtitleRes) {

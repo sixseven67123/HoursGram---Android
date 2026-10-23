@@ -13,7 +13,13 @@
     <string name="HoursGramStudioGraphite">Graphite</string>
     <string name="HoursGramStudioSilver">Silver</string>
     <string name="HoursGramStudioMarket">Gift market</string>
-    <string name="HoursGramStudioMarketHint">Demo catalog · purchases stay local</string>
+    <string name="HoursGramStudioMarketHint">Telegram gift catalog · purchases stay local</string>
+    <string name="HoursGramStudioMarketLoading">Loading Telegram gifts…</string>
+    <string name="HoursGramStudioMarketEmpty">No gifts are available right now</string>
+    <string name="HoursGramStudioMarketError">Could not load gifts. Check your connection and try again.</string>
+    <string name="HoursGramStudioRetry">Try again</string>
+    <string name="HoursGramStudioShowMore">Show more gifts</string>
+    <string name="HoursGramStudioGift">Gift</string>
     <string name="HoursGramStudioBuyGift">Add to profile · %1$d ★</string>
     <string name="HoursGramStudioOwned">Added to profile</string>
     <string name="HoursGramStudioNeedStars">Add local Stars</string>
@@ -5861,7 +5867,7 @@
     <string name="BioLimitTitle">Bio</string>
     <string name="BioLimitSubtitle">Add more symbols and use links in your bio.</string>
     <string name="AppIcon">App Icon</string>
-    <string name="AppIconDefault">Default</string>
+    <string name="AppIconDefault">HoursGram</string>
     <string name="AppIconVintage">Vintage</string>
     <string name="AppIconAqua">Aqua</string>
     <string name="AppIconPremium">Premium</string>
