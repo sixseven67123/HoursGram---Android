@@ -133,8 +133,8 @@ public class HoursGramStudioActivity extends BaseFragment {
             }
         });
 
-        bodyTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/hoursgram/montserrat.ttf");
-        headingTypeface = Typeface.create(bodyTypeface, Typeface.BOLD);
+        bodyTypeface = AndroidUtilities.getTypeface(AndroidUtilities.TYPEFACE_ROBOTO_REGULAR);
+        headingTypeface = AndroidUtilities.getTypeface(AndroidUtilities.TYPEFACE_ROBOTO_MEDIUM);
 
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setBackgroundColor(APP_BACKGROUND);
@@ -165,11 +165,11 @@ public class HoursGramStudioActivity extends BaseFragment {
     private void addProfilePreview() {
         addSectionHeading(contentLayout, R.string.HoursGramStudioPreview, R.string.HoursGramStudioSubtitle);
         TLRPC.User self = getUserConfig().getCurrentUser();
-        String displayName = self == null ? "HoursGram" : TextUtils.join(" ", new String[] {
+        String displayName = self == null ? "HorusGram" : TextUtils.join(" ", new String[] {
                 self.first_name == null ? "" : self.first_name,
                 self.last_name == null ? "" : self.last_name
         }).trim();
-        if (displayName.isEmpty()) displayName = "HoursGram";
+        if (displayName.isEmpty()) displayName = "HorusGram";
         String username = self == null ? "" : UserObject.getPublicUsername(self);
         String about = "";
         if (self != null) {

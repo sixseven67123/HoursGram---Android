@@ -99,7 +99,7 @@ public class FilesMigrationService extends Service {
 
         File newPath = ApplicationLoader.applicationContext.getExternalFilesDir(null);
         File telegramPath = new File(newPath, AyuConstants.APP_NAME);
-        File oldPath = new File(path, AyuConstants.APP_NAME);
+        File oldPath = new File(path, AyuConstants.APP_LEGACY_NAME);
 
         totalFilesCount = getFilesCount(oldPath);
 
@@ -205,7 +205,7 @@ public class FilesMigrationService extends Service {
                     }
                 }
             }
-            File oldDirectory = new File(path, AyuConstants.APP_NAME);
+            File oldDirectory = new File(path, AyuConstants.APP_LEGACY_NAME);
             hasOldFolder = oldDirectory.exists();
         }
         if (hasOldFolder) {

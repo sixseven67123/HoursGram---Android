@@ -8997,7 +8997,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     cell.getTextView().setGravity(Gravity.CENTER_HORIZONTAL);
                     cell.getTextView().setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText3));
                     cell.getTextView().setMovementMethod(null);
-                    cell.setText(LocaleUtils.getAppName() + " " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.AYU_VERSION + ")" + (AppUtils.isAppModified() ? "\nHoursGram" : ""));
+                    cell.setText(LocaleUtils.getAppName() + " " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.AYU_VERSION + ")" + (AppUtils.isAppModified() ? "\nHorusGram" : ""));
                     cell.getTextView().setPadding(0, AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14));
                     view = cell;
                     view.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, getThemedColor(Theme.key_windowBackgroundGrayShadow)));

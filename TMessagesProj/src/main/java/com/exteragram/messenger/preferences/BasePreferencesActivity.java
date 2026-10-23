@@ -13,6 +13,8 @@ package com.exteragram.messenger.preferences;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -48,6 +50,9 @@ import org.telegram.ui.Components.SlideChooseView;
 public abstract class BasePreferencesActivity extends BaseFragment {
 
     protected static final Object payload = new Object();
+    private static final int PREFERENCE_CARD_RADIUS_DP = 16;
+    private static final int PREFERENCE_CARD_HORIZONTAL_MARGIN_DP = 12;
+    private static final int PREFERENCE_CARD_VERTICAL_MARGIN_DP = 3;
 
     protected RecyclerListView listView;
     protected BaseListAdapter listAdapter;
@@ -231,8 +236,27 @@ public abstract class BasePreferencesActivity extends BaseFragment {
                 default:
                     throw new IllegalStateException("Unexpected value: " + viewType);
             }
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
+            RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+            if (isRoundedPreferenceRow(viewType)) {
+                int horizontalMargin = AndroidUtilities.dp(PREFERENCE_CARD_HORIZONTAL_MARGIN_DP);
+                int verticalMargin = AndroidUtilities.dp(PREFERENCE_CARD_VERTICAL_MARGIN_DP);
+                layoutParams.setMargins(horizontalMargin, verticalMargin, horizontalMargin, verticalMargin);
+                view.setBackground(createPreferenceCardBackground());
+            }
+            view.setLayoutParams(layoutParams);
             return new RecyclerListView.Holder(view);
         }
+    }
+
+    private boolean isRoundedPreferenceRow(int viewType) {
+        return viewType == 2 || viewType == 5 || viewType == 7 || viewType == 13 || viewType == 18 || viewType == 19;
+    }
+
+    private Drawable createPreferenceCardBackground() {
+        int radius = AndroidUtilities.dp(PREFERENCE_CARD_RADIUS_DP);
+        return new LayerDrawable(new Drawable[] {
+                Theme.createRoundRectDrawable(radius, Theme.getColor(Theme.key_dialogBackground)),
+                Theme.createRadSelectorDrawable(Theme.getColor(Theme.key_listSelector), radius, radius)
+        });
     }
 }

@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build HoursGram APK (afat release)
+    name: Build HorusGram APK (afat release)
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
@@ -96,7 +96,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: HoursGram-Android-APK
+          name: HorusGram-Android-APK
           path: TMessagesProj/build/outputs/apk/afat/release/*.apk
           if-no-files-found: error
           retention-days: 7

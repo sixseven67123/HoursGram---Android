@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="AppName">HoursGram</string>
-    <string name="HoursGramStudioTitle">Студия HoursGram</string>
+    <string name="AppName">HorusGram</string>
+    <string name="HoursGramStudioTitle">Студия HorusGram</string>
     <string name="HoursGramStudioSubtitle">Локальное оформление профиля и коллекция</string>
     <string name="HoursGramStudioLocalOnly">Звёзды и подарки сохраняются только на этом устройстве и не меняют ваш аккаунт Telegram.</string>
     <string name="HoursGramStudioPreview">Предпросмотр профиля</string>
@@ -33,7 +33,7 @@
     <string name="HoursGramStudioGiftIceCream">Шоколадный батончик</string>
     <string name="HoursGramStudioGiftLantern">Фонарь</string>
     <string name="HoursGramStudioGiftTrophy">Золотой кубок</string>
-    <string name="HoursGramStudioLocalProfile">Предпросмотр профиля HoursGram</string>
+    <string name="HoursGramStudioLocalProfile">Предпросмотр профиля HorusGram</string>
     <string name="HoursGramStudioLocalOnlyShort">только на устройстве</string>
     <string name="HoursGramStudioActionStars">Звёзды</string>
     <string name="HoursGramStudioActionGifts">Подарки</string>

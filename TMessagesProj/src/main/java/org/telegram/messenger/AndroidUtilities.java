@@ -210,6 +210,12 @@ public class AndroidUtilities {
     public final static String TYPEFACE_ROBOTO_MEDIUM_ITALIC = "fonts/rmediumitalic.ttf";
     public final static String TYPEFACE_ROBOTO_MONO = "fonts/rmono.ttf";
     public final static String TYPEFACE_MERRIWEATHER_BOLD = "fonts/mw_bold.ttf";
+    private static final String TYPEFACE_HORUSGRAM_REGULAR = "fonts/hoursgram/montserrat.ttf";
+    private static final String TYPEFACE_HORUSGRAM_ITALIC = "fonts/hoursgram/montserrat-italic.ttf";
+    private static final String TYPEFACE_HORUSGRAM_STATIC_REGULAR = "fonts/hoursgram/montserrat-static-regular.ttf";
+    private static final String TYPEFACE_HORUSGRAM_STATIC_ITALIC = "fonts/hoursgram/montserrat-static-italic.ttf";
+    private static final String TYPEFACE_HORUSGRAM_HEADING = "fonts/hoursgram/montserrat-alternates-semibold.ttf";
+    private static final String TYPEFACE_HORUSGRAM_HEADING_ITALIC = "fonts/hoursgram/montserrat-alternates-semibolditalic.ttf";
     public final static String TYPEFACE_COURIER_NEW_BOLD = "fonts/courier_new_bold.ttf";
 
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
@@ -1735,6 +1741,7 @@ public class AndroidUtilities {
         synchronized (typefaceCache) {
             if (!typefaceCache.containsKey(assetPath)) {
                 Typeface t = null;
+                String typefaceAssetPath = ExteraConfig.useSystemFonts ? assetPath : getHorusGramTypefaceAssetPath(assetPath);
                 try {
                     if (ExteraConfig.useSystemFonts) {
                         switch (assetPath) {
@@ -1767,16 +1774,20 @@ public class AndroidUtilities {
                         }
                     } else {
                         if (Build.VERSION.SDK_INT >= 26) {
-                            Typeface.Builder builder = new Typeface.Builder(ApplicationLoader.applicationContext.getAssets(), assetPath);
-                            if (assetPath.contains("medium")) {
+                            Typeface.Builder builder = new Typeface.Builder(ApplicationLoader.applicationContext.getAssets(), typefaceAssetPath);
+                            if (typefaceAssetPath.contains("medium")) {
                                 builder.setWeight(700);
+                            } else if (typefaceAssetPath.equals(TYPEFACE_HORUSGRAM_REGULAR) || typefaceAssetPath.equals(TYPEFACE_HORUSGRAM_ITALIC)) {
+                                builder.setWeight(400);
+                            } else if (typefaceAssetPath.contains("semibold")) {
+                                builder.setWeight(600);
                             }
-                            if (assetPath.contains("italic")) {
+                            if (typefaceAssetPath.contains("italic")) {
                                 builder.setItalic(true);
                             }
                             t = builder.build();
                         } else {
-                            t = Typeface.createFromAsset(ApplicationLoader.applicationContext.getAssets(), assetPath);
+                            t = Typeface.createFromAsset(ApplicationLoader.applicationContext.getAssets(), typefaceAssetPath);
                         }
                     }
                 } catch (Exception e) {
@@ -1789,6 +1800,22 @@ public class AndroidUtilities {
                 return t;
             }
             return typefaceCache.get(assetPath);
+        }
+    }
+
+    private static String getHorusGramTypefaceAssetPath(String assetPath) {
+        switch (assetPath) {
+            case TYPEFACE_ROBOTO_REGULAR:
+                return Build.VERSION.SDK_INT >= 26 ? TYPEFACE_HORUSGRAM_REGULAR : TYPEFACE_HORUSGRAM_STATIC_REGULAR;
+            case TYPEFACE_ROBOTO_ITALIC:
+                return Build.VERSION.SDK_INT >= 26 ? TYPEFACE_HORUSGRAM_ITALIC : TYPEFACE_HORUSGRAM_STATIC_ITALIC;
+            case TYPEFACE_ROBOTO_MEDIUM:
+            case TYPEFACE_ROBOTO_CONDENSED_BOLD:
+                return TYPEFACE_HORUSGRAM_HEADING;
+            case TYPEFACE_ROBOTO_MEDIUM_ITALIC:
+                return TYPEFACE_HORUSGRAM_HEADING_ITALIC;
+            default:
+                return assetPath;
         }
     }
 

@@ -4335,7 +4335,7 @@ public class Theme {
         SharedPreferences themeConfig = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
 
         ThemeInfo themeInfo = new ThemeInfo();
-        themeInfo.name = "HoursGram";
+        themeInfo.name = "HorusGram";
         themeInfo.assetName = "hoursgram.attheme";
         themeInfo.previewBackgroundColor = 0xff3c3e4b;
         themeInfo.previewInColor = 0xff2e303c;
@@ -4344,20 +4344,20 @@ public class Theme {
         themeInfo.currentAccentId = DEFALT_THEME_ACCENT_ID;
         themeInfo.sortIndex = 1;
 
-        setHoursGramAccent(themeInfo);
+        setHorusGramAccent(themeInfo);
         sortAccents(themeInfo);
         themes.add(currentDayTheme = currentTheme = defaultTheme = themeInfo);
         themesDict.put("Blue", themeInfo);
 
         themeInfo = new ThemeInfo();
-        themeInfo.name = "HoursGram Dark";
+        themeInfo.name = "HorusGram Dark";
         themeInfo.assetName = "hoursgram-dark.attheme";
         themeInfo.previewBackgroundColor = 0xff3c3e4b;
         themeInfo.previewInColor = 0xff2e303c;
         themeInfo.previewOutColor = 0xff8993d8;
         themeInfo.sortIndex = 3;
 
-        setHoursGramAccent(themeInfo);
+        setHorusGramAccent(themeInfo);
         sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Dark Blue", currentNightTheme = themeInfo);
@@ -4728,7 +4728,7 @@ public class Theme {
         AndroidUtilities.runOnUIThread(Theme::checkAutoNightThemeConditions);
     }
 
-    private static void setHoursGramAccent(ThemeInfo info) {
+    private static void setHorusGramAccent(ThemeInfo info) {
         info.firstAccentIsDefault = true;
         info.currentAccentId = DEFALT_THEME_ACCENT_ID;
         info.setAccentColorOptions(

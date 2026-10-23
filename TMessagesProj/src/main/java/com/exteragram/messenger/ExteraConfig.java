@@ -192,7 +192,7 @@ public class ExteraConfig {
             squareFab = preferences.getBoolean("squareFab", true);
             forceBlur = preferences.getBoolean("forceBlur", true);
             forceSnow = preferences.getBoolean("forceSnow", false);
-            useSystemFonts = preferences.getBoolean("useSystemFonts", true);
+            useSystemFonts = preferences.getBoolean("useSystemFonts", false);
             newSwitchStyle = preferences.getBoolean("newSwitchStyle", true);
             disableDividers = preferences.getBoolean("disableDividers", false);
             useLNavigation = preferences.getBoolean("useLNavigation", false);

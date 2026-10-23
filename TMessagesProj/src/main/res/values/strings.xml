@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="AppName">HoursGram</string>
-    <string name="HoursGramStudioTitle">HoursGram Studio</string>
+    <string name="AppName">HorusGram</string>
+    <string name="HoursGramStudioTitle">HorusGram Studio</string>
     <string name="HoursGramStudioSubtitle">Local profile style and collectible previews</string>
     <string name="HoursGramStudioLocalOnly">Stars and gifts here are saved only on this device. They do not change your Telegram account.</string>
     <string name="HoursGramStudioPreview">Profile preview</string>
@@ -33,7 +33,7 @@
     <string name="HoursGramStudioGiftIceCream">Chocolate Bar</string>
     <string name="HoursGramStudioGiftLantern">Lantern</string>
     <string name="HoursGramStudioGiftTrophy">Golden Trophy</string>
-    <string name="HoursGramStudioLocalProfile">HoursGram profile preview</string>
+    <string name="HoursGramStudioLocalProfile">HorusGram profile preview</string>
     <string name="HoursGramStudioLocalOnlyShort">on this device</string>
     <string name="HoursGramStudioActionStars">Stars</string>
     <string name="HoursGramStudioActionGifts">Gifts</string>
@@ -43,7 +43,7 @@
     <string name="HoursGramStudioUsername">Username</string>
     <string name="HoursGramStudioNoBio">No bio</string>
     <string name="HoursGramStudioNoUsername">Username not set</string>
-    <string name="AppNameBeta">HoursGram Beta</string>
+    <string name="AppNameBeta">HorusGram Beta</string>
     <string name="LanguageName">English</string>
     <string name="English">English</string>
     <string name="LanguageNameInEnglish">English</string>
@@ -5867,7 +5867,7 @@
     <string name="BioLimitTitle">Bio</string>
     <string name="BioLimitSubtitle">Add more symbols and use links in your bio.</string>
     <string name="AppIcon">App Icon</string>
-    <string name="AppIconDefault">HoursGram</string>
+    <string name="AppIconDefault">HorusGram</string>
     <string name="AppIconVintage">Vintage</string>
     <string name="AppIconAqua">Aqua</string>
     <string name="AppIconPremium">Premium</string>

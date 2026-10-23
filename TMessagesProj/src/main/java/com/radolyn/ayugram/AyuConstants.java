@@ -49,8 +49,9 @@ public class AyuConstants {
 
     public static String AYU_DATABASE = "ayu-data";
 
-    public static String APP_GITHUB = "AyuGram/AyuGram4A";
-    public static String APP_NAME = "AyuGram";
+    public static String APP_GITHUB = "sixseven67123/HoursGram---Android";
+    public static String APP_NAME = "HorusGram";
+    public static final String APP_LEGACY_NAME = "AyuGram";
 
     public static String BUILD_STORE_PACKAGE = "com.android.vending";
     public static String BUILD_ORIGINAL_PACKAGE = "org.telegram.messenger";

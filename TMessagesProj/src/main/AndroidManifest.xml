@@ -118,6 +118,8 @@
     <!-- AyuGram: remove for release `usesCleartextTraffic` -->
     <application
         android:name=".ApplicationLoader"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/exteraAppName"
         android:allowAudioPlaybackCapture="true"
         android:allowBackup="true"
         android:backupAgent=".BackupAgent"
@@ -126,6 +128,7 @@
         android:hasFragileUserData="true"
         android:largeHeap="true"
         android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity"
+        android:roundIcon="@mipmap/ic_launcher"
         android:preserveLegacyExternalStorage="true"
         android:requestLegacyExternalStorage="true"
         android:restoreAnyVersion="true"
@@ -141,6 +144,9 @@
             android:name="com.exteragram.messenger.DefaultIcon"
             android:enabled="true"
             android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/exteraAppName"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity="org.telegram.ui.LaunchActivity">
 
             <intent-filter>
