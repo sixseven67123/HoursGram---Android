@@ -149,7 +149,12 @@ android {
         }
     }
 
-    packagingOptions.exclude 'META-INF/DEPENDENCIES'
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+        exclude 'META-INF/DEPENDENCIES'
+    }
 
     buildTypes {
         debug {
