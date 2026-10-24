@@ -95,32 +95,83 @@ Well, just fork it.
 
 **But please, don't forget to mention us in your README.**
 
-## How to build
+## Build HorusGram for Android
 
-1. Clone source code using `git clone https://github.com/AyuGram/AyuGram4A.git`
-2. Open the project in Android Studio. It should be opened, **not imported**
-3. Implement the `AyuMessageUtils` & `AyuHistoryHook` classes. It's not that hard, but if you're
-   making your **very** own fork, then you should take some time to write this part of code. Or you can search for a reversed version :)
-4. Replace `google-services.json` (we don't want to see crash reports from your app...)
-5. Generate application certificate and fill API_KEYS:
-   ```
-   APP_ID = 6
-   APP_HASH = "eb06d4abfb49dc3eeb1aeb98ae0f581e"
-   MAPS_V2_API = abcdef12345678
-   
-   SIGNING_KEY_PASSWORD = password
-   SIGNING_KEY_ALIAS = alias
-   SIGNING_KEY_STORE_PASSWORD = password
-   ```
-6. You are ready to compile `AyuGram`
+Use Android Studio with JDK 17 and install these SDK components from SDK Manager:
 
-- **AyuGram** can be built with **Android Studio** or from the command line with **Gradle**:
+- Android SDK Platform 33
+- Android SDK Build-Tools 33.0.1
+- Android NDK 21.4.7075529
+- CMake 3.10.2.4988404
 
-```
-./gradlew assembleAfatRelease
+Clone this repository and open its root folder in Android Studio. The private AyuGram
+submodule is optional; this fork includes open stubs for builds without it.
+
+Create an `API_KEYS` file in the repository root. It is ignored by Git. Keep your own
+signing keystore outside the repository and point `SIGNING_KEY_STORE` to it so repeated
+local builds can update the same installation on your phone:
+
+```powershell
+keytool -genkeypair -v -keystore "C:\Users\you\keys\horusgram.jks" -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias horusgram
 ```
 
-## AyuGram Localization
+Use the keystore and key passwords entered by `keytool` in the `API_KEYS` file below.
+
+```properties
+APP_ID = 6
+APP_HASH = "eb06d4abfb49dc3eeb1aeb98ae0f581e"
+MAPS_V2_API =
+SIGNING_KEY_STORE = C:/Users/you/keys/horusgram.jks
+SIGNING_KEY_PASSWORD = your-key-password
+SIGNING_KEY_ALIAS = your-key-alias
+SIGNING_KEY_STORE_PASSWORD = your-store-password
+```
+
+For the fastest phone preview, connect an Android device with USB debugging enabled,
+select the `betaDebug` variant, and run:
+
+```powershell
+.\gradlew.bat installBetaDebug
+```
+
+Or build the APK without installing it:
+
+```powershell
+.\gradlew.bat assembleBetaDebug
+```
+
+The preview APK is written to
+`TMessagesProj/build/outputs/apk/beta/debug/` and includes ARM 32-bit and 64-bit
+libraries. `betaDebug` skips release shrinking, so use this for design iteration.
+On Android 8.0 or newer, Android Studio's **Apply Changes** can update supported
+code edits while the app is running; manifest, native-library, and some resource
+changes still need a normal Run/restart.
+
+For the full release APK, which takes longer because it builds all four ABIs and
+shrinks the app, run:
+
+```powershell
+.\gradlew.bat assembleAfatRelease
+```
+
+The release APK is written to `TMessagesProj/build/outputs/apk/afat/release/`.
+
+For repeatable GitHub Actions installs, add these repository secrets:
+`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, and
+`ANDROID_KEY_PASSWORD`. Encode the private keystore for the first secret with:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\you\keys\horusgram.jks"))
+```
+
+Without these secrets, Actions signs each APK with a new temporary key; Android
+will reject installing it over a previous CI build.
+
+To inspect the actual native Android UI, run the app on the phone and open Android
+Studio's **Layout Inspector** from the Running Devices window. It can inspect this
+project's runtime Views, which are built in Java rather than Compose.
+
+## Localization
 
 [![Crowdin](https://badges.crowdin.net/ayugram/localized.svg)](https://crowdin.com/project/ayugram)
 [![Crowdin](https://badges.crowdin.net/exteralocales/localized.svg)](https://crowdin.com/project/exteralocales)

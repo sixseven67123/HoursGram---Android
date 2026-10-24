@@ -30,7 +30,7 @@
         android:largeHeap="true"
         android:supportsRtl="false"
         android:requestLegacyExternalStorage="true"
-        tools:replace="android:supportsRtl">
+        tools:replace="android:supportsRtl,android:label">
 
         <service
             android:name="org.telegram.messenger.GcmPushListenerService" android:exported="false">

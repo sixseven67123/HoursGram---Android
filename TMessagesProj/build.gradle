@@ -142,7 +142,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("config/extera.jks")
+            storeFile file(localProperties.getProperty("SIGNING_KEY_STORE", "config/extera.jks"))
             storePassword localProperties.getProperty("SIGNING_KEY_STORE_PASSWORD")
             keyAlias localProperties.getProperty("SIGNING_KEY_ALIAS")
             keyPassword localProperties.getProperty("SIGNING_KEY_PASSWORD")
